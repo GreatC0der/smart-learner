@@ -2,7 +2,7 @@ use std::{path::Path, fs::read_to_string};
 
 use smart_learner_core::deck::Deck;
 
-pub fn fetch_decks(path: &Path) {
+pub fn fetch_decks(path: &Path) -> Vec<Deck>{
     let mut decks = Vec::new();
     for file in path.read_dir().unwrap() {
         let path = file.unwrap();
@@ -10,6 +10,7 @@ pub fn fetch_decks(path: &Path) {
             decks.push(load_deck(&path.path()));
         }
     }
+    decks
 }
 
 fn load_deck(path: &Path) -> Deck{
