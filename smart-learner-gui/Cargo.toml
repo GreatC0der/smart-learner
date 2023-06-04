@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 eframe = "0.22.0"
+egui_file = "0.9.0"
 env_logger = "0.10.0"
 smart-learner-helper = { version = "0.1.0", path = "../smart-learner-helper" }
