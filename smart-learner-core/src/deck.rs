@@ -4,13 +4,15 @@ use serde_derive::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Deck {
+    pub name: String,
     pub cards: Vec<Card>,
     pub last_update: Date, // day, month, year
 }
 
 impl Deck {
-    pub fn new() -> Self {
+    pub fn new(name: String) -> Self {
         Deck {
+            name,
             cards: Vec::new(),
             last_update: Date::current(),
         }
