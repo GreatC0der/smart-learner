@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, fs::read_to_string};
 
 use smart_learner_core::deck::Deck;
 
@@ -13,5 +13,6 @@ pub fn fetch_decks(path: &Path) {
 }
 
 fn load_deck(path: &Path) -> Deck{
-    todo!()
+    let data = read_to_string(path).unwrap();
+    serde_json::from_str(&data).unwrap()
 }

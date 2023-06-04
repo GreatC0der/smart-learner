@@ -36,7 +36,6 @@ impl Default for GuiApp {
 
 impl eframe::App for GuiApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
-
         // Menu
         egui::TopBottomPanel::bottom(Id::new("menu")).show(ctx, |ui| {
             ui.horizontal(|ui| {
@@ -49,9 +48,7 @@ impl eframe::App for GuiApp {
         // Showing the page
         match self.state {
             GuiState::MainPage => {
-                egui::CentralPanel::default().show(ctx, |ui| {
-                    
-                });
+                egui::CentralPanel::default().show(ctx, |ui| {});
             }
         }
     }

@@ -1,5 +1,8 @@
 use crate::card::Card;
 use crate::date::Date;
+use serde_derive::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
 pub struct Deck {
     pub cards: Vec<Card>,
     pub last_update: Date, // day, month, year

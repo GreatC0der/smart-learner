@@ -1,6 +1,8 @@
 use crate::field::Field;
 use crate::result::Result;
+use serde_derive::{Deserialize, Serialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct Card {
     pub front: Field,
     pub back: Field,
