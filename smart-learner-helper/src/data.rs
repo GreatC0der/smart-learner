@@ -8,7 +8,7 @@ use smart_learner_core::deck::Deck;
 
 pub struct DeckFromFile {
     pub value: Deck,
-    path: String,
+    pub path: String,
 }
 
 impl Drop for DeckFromFile {
@@ -16,7 +16,7 @@ impl Drop for DeckFromFile {
         let data = serde_json::to_string(&self.value).unwrap();
         let mut file = OpenOptions::new()
             .write(true)
-            .create_new(true)
+            .create(true)
             .open(&self.path)
             .unwrap();
         let _ = file.write(data.as_bytes());
