@@ -1,6 +1,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use eframe::{egui::{self, Id}, epaint::Vec2};
+use eframe::{
+    egui::{self, Id},
+    epaint::Vec2,
+};
 use egui_file::FileDialog;
 use smart_learner_helper::app::App;
 fn main() {
@@ -17,33 +20,32 @@ fn main() {
     .unwrap();
 }
 
-struct GuiApp {
-    app: App,
+struct GuiApp<'a> {
+    app: App<'a>,
     state: GuiState,
-    revising_deck: usize,
     new_deck_name: String,
     choose_folder_dialog: Option<FileDialog>,
 }
 
 enum GuiState {
     MainPage,
-    Revising,
+    RevisingWithoutAnswer,
+    RevisingWithAnswer,
     Settings,
 }
 
-impl Default for GuiApp {
+impl Default for GuiApp<'_> {
     fn default() -> Self {
         Self {
             app: App::new(),
             state: GuiState::MainPage,
-            revising_deck: 0,
             new_deck_name: "".to_string(),
             choose_folder_dialog: None,
         }
     }
 }
 
-impl eframe::App for GuiApp {
+impl eframe::App for GuiApp<'_> {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Menu
         egui::TopBottomPanel::bottom(Id::new("menu")).show(ctx, |ui| {
@@ -65,8 +67,8 @@ impl eframe::App for GuiApp {
                     let label = ui.label("Decks:");
                     for (index, deck) in self.app.decks.iter().enumerate() {
                         if ui.link(&deck.value.name).labelled_by(label.id).clicked() {
-                            self.state = GuiState::Revising;
-                            self.revising_deck = index;
+                            self.state = GuiState::RevisingWithoutAnswer;
+                            self.app.current_deck = index;
                         }
                     }
 
@@ -82,15 +84,35 @@ impl eframe::App for GuiApp {
                     });
                 });
             }
-            GuiState::Revising => {
+
+            GuiState::RevisingWithoutAnswer => {
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    ui.label("Revise in your book!");
+                    match self.app.get_front_for_revision() {
+                        Some(value) => {
+                            ui.heading(&value);
+                            if ui.button("Show answer").clicked() {
+                                self.state = GuiState::RevisingWithAnswer;
+                            }
+                        }
+                        None => {
+                            ui.heading("No cards to review.");
+                        }
+                    }
                 });
             }
+
+            GuiState::RevisingWithAnswer => {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    ui.heading(self.app.get_question());
+                    ui.heading(self.app.get_answer());                    
+                });
+            } 
+
             GuiState::Settings => {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     if ui.button("Change folder with decks").clicked() {
-                        let mut dialog = FileDialog::select_folder(None).default_size(Vec2::new(480.0, 300.0));
+                        let mut dialog =
+                            FileDialog::select_folder(None).default_size(Vec2::new(480.0, 300.0));
                         dialog.open();
                         self.choose_folder_dialog = Some(dialog);
                     }
