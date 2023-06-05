@@ -20,8 +20,8 @@ fn main() {
     .unwrap();
 }
 
-struct GuiApp<'a> {
-    app: App<'a>,
+struct GuiApp {
+    app: App,
     state: GuiState,
     new_deck_name: String,
     choose_folder_dialog: Option<FileDialog>,
@@ -35,7 +35,7 @@ enum GuiState {
     Settings,
 }
 
-impl Default for GuiApp<'_> {
+impl Default for GuiApp {
     fn default() -> Self {
         Self {
             app: App::new(),
@@ -46,7 +46,7 @@ impl Default for GuiApp<'_> {
     }
 }
 
-impl eframe::App for GuiApp<'_> {
+impl eframe::App for GuiApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // Menu
         egui::TopBottomPanel::bottom(Id::new("menu")).show(ctx, |ui| {

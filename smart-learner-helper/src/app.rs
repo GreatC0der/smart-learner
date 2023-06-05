@@ -7,16 +7,16 @@ use crate::{
     data::{self, DeckFromFile},
 };
 
-pub struct App<'a> {
+pub struct App {
     pub config: Config,
     pub decks: Vec<DeckFromFile>,
     pub current_deck: usize,
-    pub current_card: Option<&'a Card>,
+    pub current_card: Option<usize>,
     pub new_card_front: String,
     pub new_card_back: String,
 }
 
-impl App<'_> {
+impl App {
     pub fn new() -> Self {
         let config: Config = confy::load("smart-learner", None).unwrap();
         let decks = data::fetch_decks(&Path::new(&config.folder_path));
@@ -40,9 +40,9 @@ impl App<'_> {
     }
 
     pub fn get_front_for_revision(&mut self) -> Option<String> {
-        let card = match self.current_card {
+        self.current_card = match self.current_card {
             Some(result) => {
-                if result.current_repeat_in == 0 {
+                if self.decks[self.current_deck].value.cards[result].current_repeat_in == 0 {
                     Some(result)
                 } else {
                     self.decks[self.current_deck].value.due_card()
@@ -51,15 +51,23 @@ impl App<'_> {
             None => self.decks[self.current_deck].value.due_card(),
         };
 
-        match card {
-            Some(result) => Some(result.front.text.clone()),
+        match self.current_card {
+            Some(result) => Some(
+                self.decks[self.current_deck].value.cards[result]
+                    .front
+                    .text
+                    .clone(),
+            ),
             None => None,
         }
     }
 
     pub fn get_answer(&self) -> String {
         if self.current_card.is_some() {
-            self.current_card.unwrap().back.text.clone()
+            self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
+                .back
+                .text
+                .clone()
         } else {
             "".to_string()
         }
@@ -67,7 +75,10 @@ impl App<'_> {
 
     pub fn get_question(&self) -> String {
         if self.current_card.is_some() {
-            self.current_card.unwrap().front.text.clone()
+            self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
+            .front
+            .text
+            .clone()
         } else {
             "".to_string()
         }

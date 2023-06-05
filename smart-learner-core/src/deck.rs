@@ -34,11 +34,11 @@ impl Deck {
         self.last_update = current_date;
     }
 
-    pub fn due_card(&self) -> Option<&Card> {
+    pub fn due_card(&self) -> Option<usize> {
         let mut result = None;
-        for card in &self.cards {
-            if card.current_repeat_in == 0 {
-                result = Some(card);
+        for card in self.cards.iter().enumerate() {
+            if card.1.current_repeat_in == 0 {
+                result = Some(card.0);
             }
         }
         result
