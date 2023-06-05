@@ -1,17 +1,19 @@
 use std::path::Path;
 
-use smart_learner_core::{deck::Deck, card::Card};
+use smart_learner_core::{card::Card, deck::Deck, field::Field};
 
 use crate::{
     config::Config,
     data::{self, DeckFromFile},
 };
 
-pub struct App<'a>{
+pub struct App<'a> {
     pub config: Config,
     pub decks: Vec<DeckFromFile>,
     pub current_deck: usize,
     pub current_card: Option<&'a Card>,
+    pub new_card_front: String,
+    pub new_card_back: String,
 }
 
 impl App<'_> {
@@ -23,6 +25,8 @@ impl App<'_> {
             decks,
             current_deck: 0,
             current_card: None,
+            new_card_front: String::new(),
+            new_card_back: String::new(),
         }
     }
 
@@ -34,8 +38,8 @@ impl App<'_> {
             path: path.as_path().to_str().unwrap().to_string() + ".sdeck",
         });
     }
-    
-    pub fn get_front_for_revision(&mut self) -> Option<String>{
+
+    pub fn get_front_for_revision(&mut self) -> Option<String> {
         let card = match self.current_card {
             Some(result) => {
                 if result.current_repeat_in == 0 {
@@ -43,23 +47,36 @@ impl App<'_> {
                 } else {
                     self.decks[self.current_deck].value.due_card()
                 }
-            },
-            None => {
-                self.decks[self.current_deck].value.due_card()                
             }
+            None => self.decks[self.current_deck].value.due_card(),
         };
-        
+
         match card {
             Some(result) => Some(result.front.text.clone()),
             None => None,
         }
     }
-    
+
     pub fn get_answer(&self) -> String {
         self.current_card.unwrap().back.text.clone()
     }
-    
+
     pub fn get_question(&self) -> String {
         self.current_card.unwrap().front.text.clone()
+    }
+
+    pub fn current_deck_name(&self) -> String {
+        self.decks[self.current_deck].value.name.clone()
+    }
+
+    pub fn create_card(&mut self) {
+        self.decks[self.current_deck].value.cards.push(Card::new(
+            Field {
+                text: self.new_card_front.clone(),
+            },
+            Field {
+                text: self.new_card_back.clone(),
+            },
+        ));
     }
 }

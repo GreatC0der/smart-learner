@@ -28,7 +28,8 @@ struct GuiApp<'a> {
 }
 
 enum GuiState {
-    MainPage,
+    Main,
+    NewCard,
     RevisingWithoutAnswer,
     RevisingWithAnswer,
     Settings,
@@ -38,7 +39,7 @@ impl Default for GuiApp<'_> {
     fn default() -> Self {
         Self {
             app: App::new(),
-            state: GuiState::MainPage,
+            state: GuiState::Main,
             new_deck_name: "".to_string(),
             choose_folder_dialog: None,
         }
@@ -51,17 +52,20 @@ impl eframe::App for GuiApp<'_> {
         egui::TopBottomPanel::bottom(Id::new("menu")).show(ctx, |ui| {
             ui.horizontal(|ui| {
                 if ui.button("Home").clicked() {
-                    self.state = GuiState::MainPage;
+                    self.state = GuiState::Main;
                 };
                 if ui.button("Settings").clicked() {
                     self.state = GuiState::Settings;
+                };
+                if ui.button("New card").clicked() {
+                    self.state = GuiState::NewCard;
                 };
             });
         });
 
         // Showing the page
         match self.state {
-            GuiState::MainPage => {
+            GuiState::Main => {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     // Displaying decks
                     let label = ui.label("Decks:");
@@ -104,9 +108,42 @@ impl eframe::App for GuiApp<'_> {
             GuiState::RevisingWithAnswer => {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     ui.heading(self.app.get_question());
-                    ui.heading(self.app.get_answer());                    
+                    ui.heading(self.app.get_answer());
                 });
-            } 
+            }
+
+            GuiState::NewCard => {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    ui.heading("Add a card");
+                    egui::ComboBox::from_label("Deck")
+                        .selected_text(self.app.current_deck_name())
+                        .show_ui(ui, |ui| {
+                            for (index, deck) in self.app.decks.iter().enumerate() {
+                                ui.selectable_value(
+                                    &mut self.app.current_deck,
+                                    index,
+                                    &deck.value.name,
+                                );
+                            }
+                        });
+
+                    ui.group(|ui| {
+                        let label = ui.label("Front:");
+                        ui.text_edit_multiline(&mut self.app.new_card_front)
+                            .labelled_by(label.id);
+                    });
+
+                    ui.group(|ui| {
+                        let label = ui.label("Back:");
+                        ui.text_edit_multiline(&mut self.app.new_card_back)
+                            .labelled_by(label.id);
+                    });
+                    
+                    if ui.button("Create").clicked() {
+                        self.app.create_card();
+                    }
+                });
+            }
 
             GuiState::Settings => {
                 egui::CentralPanel::default().show(ctx, |ui| {
