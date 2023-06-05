@@ -94,7 +94,7 @@ impl eframe::App for GuiApp {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     match self.app.get_front_for_revision() {
                         Some(value) => {
-                            ui.heading(&value);
+                            ui.group(|ui| ui.heading(&value));
                             if ui.button("Show answer").clicked()
                                 || ctx.input(|i| i.key_pressed(Key::Space))
                             {
@@ -110,8 +110,8 @@ impl eframe::App for GuiApp {
 
             GuiState::RevisingWithAnswer => {
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    ui.heading(self.app.get_question());
-                    ui.heading(self.app.get_answer());
+                    ui.group(|ui| ui.heading(self.app.get_question()));
+                    ui.group(|ui| ui.heading(self.app.get_answer()));
                 });
             }
 
