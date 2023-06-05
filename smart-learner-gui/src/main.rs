@@ -1,11 +1,12 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use eframe::{
-    egui::{self, Id},
+    egui::{self, Id, Key},
     epaint::Vec2,
 };
 use egui_file::FileDialog;
 use smart_learner_helper::app::App;
+
 fn main() {
     env_logger::init();
     let options = eframe::NativeOptions {
@@ -94,7 +95,9 @@ impl eframe::App for GuiApp {
                     match self.app.get_front_for_revision() {
                         Some(value) => {
                             ui.heading(&value);
-                            if ui.button("Show answer").clicked() {
+                            if ui.button("Show answer").clicked()
+                                || ctx.input(|i| i.key_pressed(Key::Space))
+                            {
                                 self.state = GuiState::RevisingWithAnswer;
                             }
                         }
@@ -138,7 +141,7 @@ impl eframe::App for GuiApp {
                         ui.text_edit_multiline(&mut self.app.new_card_back)
                             .labelled_by(label.id);
                     });
-                    
+
                     if ui.button("Create").clicked() {
                         self.app.create_card();
                     }
