@@ -58,15 +58,27 @@ impl App<'_> {
     }
 
     pub fn get_answer(&self) -> String {
-        self.current_card.unwrap().back.text.clone()
+        if self.current_card.is_some() {
+            self.current_card.unwrap().back.text.clone()
+        } else {
+            "".to_string()
+        }
     }
 
     pub fn get_question(&self) -> String {
-        self.current_card.unwrap().front.text.clone()
+        if self.current_card.is_some() {
+            self.current_card.unwrap().front.text.clone()
+        } else {
+            "".to_string()
+        }
     }
 
     pub fn current_deck_name(&self) -> String {
-        self.decks[self.current_deck].value.name.clone()
+        if self.decks.len() > self.current_deck {
+            self.decks[self.current_deck].value.name.clone()
+        } else {
+            "No decks".to_string()
+        }
     }
 
     pub fn create_card(&mut self) {
