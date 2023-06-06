@@ -102,7 +102,7 @@ impl App {
                 text: "".to_string(),
             },
         ));
-        self.current_card = Some(self.decks[self.current_deck].value.cards.len() - 1);
+        self.change_card(self.decks[self.current_deck].value.cards.len() - 1);
     }
 
     pub fn edit_card(&mut self) {
