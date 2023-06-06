@@ -5,8 +5,8 @@ use eframe::{
     epaint::Vec2,
 };
 use egui_file::FileDialog;
-use smart_learner_helper::app::App;
 use smart_learner_core::result::Result;
+use smart_learner_helper::app::App;
 
 fn main() {
     env_logger::init();
@@ -140,14 +140,15 @@ impl eframe::App for GuiApp {
                         ui.checkbox(&mut self.app.back_search, "Back search");
                     });
                     //search results
-                    ui.group(|ui| {
-                        for entry in self.app.search() {
+
+                    for entry in self.app.search() {
+                        ui.group(|ui| {
                             if ui.link(entry.1).clicked() {
                                 self.app.change_card(entry.0);
                                 self.state = GuiState::Editor;
                             }
-                        }
-                    });
+                        });
+                    }
                 });
             }
 
@@ -176,7 +177,6 @@ impl eframe::App for GuiApp {
 
                         if ui.button("Wrong").clicked() {
                             result = Some(Result::Wrong);
-
                         }
 
                         if ui.button("Difficult").clicked() {
