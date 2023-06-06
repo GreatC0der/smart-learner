@@ -32,6 +32,7 @@ enum GuiState {
     Main,
     Browser,
     NewCard,
+    Editor,
     RevisingWithoutAnswer,
     RevisingWithAnswer,
     Settings,
@@ -94,6 +95,27 @@ impl eframe::App for GuiApp {
                 });
             }
 
+            GuiState::Editor => {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    ui.group(|ui| {
+                        let label = ui.label("Front:");
+                        ui.text_edit_multiline(&mut self.app.card_front)
+                            .labelled_by(label.id);
+                    });
+
+                    ui.group(|ui| {
+                        let label = ui.label("Back:");
+                        ui.text_edit_multiline(&mut self.app.card_back)
+                            .labelled_by(label.id);
+                    });
+
+                    if ui.button("Save").clicked() {
+                        self.app.edit_card();
+                        self.state = GuiState::Main;
+                    }
+                });
+            }
+
             GuiState::Browser => {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     ui.horizontal(|ui| {
@@ -119,7 +141,10 @@ impl eframe::App for GuiApp {
                     //search results
                     ui.group(|ui| {
                         for entry in self.app.search() {
-                            if ui.link(entry.1).clicked() {}
+                            if ui.link(entry.1).clicked() {
+                                self.app.change_card(entry.0);
+                                self.state = GuiState::Editor;
+                            }
                         }
                     });
                 });
@@ -127,18 +152,15 @@ impl eframe::App for GuiApp {
 
             GuiState::RevisingWithoutAnswer => {
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    match self.app.get_front_for_revision() {
-                        Some(value) => {
-                            ui.group(|ui| ui.heading(&value));
-                            if ui.button("Show answer").clicked()
-                                || ctx.input(|i| i.key_pressed(Key::Space))
-                            {
-                                self.state = GuiState::RevisingWithAnswer;
-                            }
+                    if self.app.get_card_for_revision() {
+                        ui.group(|ui| ui.heading(&self.app.card_front));
+                        if ui.button("Show answer").clicked()
+                            || ctx.input(|i| i.key_pressed(Key::Space))
+                        {
+                            self.state = GuiState::RevisingWithAnswer;
                         }
-                        None => {
-                            ui.heading("No cards to review.");
-                        }
+                    } else {
+                        ui.heading("No cards to review.");
                     }
                 });
             }
@@ -153,6 +175,7 @@ impl eframe::App for GuiApp {
             GuiState::NewCard => {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     ui.heading("Add a card");
+                    //Displaying decks.
                     egui::ComboBox::from_label("Deck")
                         .selected_text(self.app.current_deck_name())
                         .show_ui(ui, |ui| {
@@ -165,20 +188,9 @@ impl eframe::App for GuiApp {
                             }
                         });
 
-                    ui.group(|ui| {
-                        let label = ui.label("Front:");
-                        ui.text_edit_multiline(&mut self.app.new_card_front)
-                            .labelled_by(label.id);
-                    });
-
-                    ui.group(|ui| {
-                        let label = ui.label("Back:");
-                        ui.text_edit_multiline(&mut self.app.new_card_back)
-                            .labelled_by(label.id);
-                    });
-
                     if ui.button("Create").clicked() {
                         self.app.create_card();
+                        self.state = GuiState::Editor;
                     }
                 });
             }
