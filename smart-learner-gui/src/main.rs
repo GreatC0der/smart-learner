@@ -167,8 +167,8 @@ impl eframe::App for GuiApp {
 
             GuiState::RevisingWithAnswer => {
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    ui.group(|ui| ui.heading(self.app.get_question()));
-                    ui.group(|ui| ui.heading(self.app.get_answer()));
+                    ui.group(|ui| ui.heading(&self.app.card_front));
+                    ui.group(|ui| ui.heading(&self.app.card_back));
                 });
             }
 
