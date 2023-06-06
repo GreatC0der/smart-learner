@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use smart_learner_core::{card::Card, deck::Deck, field::Field};
+use smart_learner_core::{card::Card, deck::Deck, field::Field, result::Result};
 
 use crate::{
     config::Config,
@@ -43,7 +43,7 @@ impl App {
         });
     }
 
-    pub fn get_card_for_revision(&mut self) -> bool{
+    pub fn get_card_for_revision(&mut self) -> bool {
         self.current_card = match self.current_card {
             Some(result) => {
                 if self.decks[self.current_deck].value.cards[result].current_repeat_in == 0 {
@@ -131,5 +131,9 @@ impl App {
         let card = &self.decks[self.current_deck].value.cards[self.current_card.unwrap()];
         self.card_front = card.front.text.clone();
         self.card_back = card.back.text.clone();
+    }
+
+    pub fn card_revised(&mut self, result: Result) {
+        self.decks[self.current_deck].value.cards[self.current_card.unwrap()].review(result);
     }
 }

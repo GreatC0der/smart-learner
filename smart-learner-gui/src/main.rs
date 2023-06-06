@@ -6,6 +6,7 @@ use eframe::{
 };
 use egui_file::FileDialog;
 use smart_learner_helper::app::App;
+use smart_learner_core::result::Result;
 
 fn main() {
     env_logger::init();
@@ -169,6 +170,28 @@ impl eframe::App for GuiApp {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     ui.group(|ui| ui.heading(&self.app.card_front));
                     ui.group(|ui| ui.heading(&self.app.card_back));
+
+                    ui.horizontal(|ui| {
+                        let mut result = None;
+
+                        if ui.button("Wrong").clicked() {
+                            result = Some(Result::Wrong);
+
+                        }
+
+                        if ui.button("Difficult").clicked() {
+                            result = Some(Result::Difficult);
+                        }
+
+                        if ui.button("Easy").clicked() {
+                            result = Some(Result::Easy);
+                        }
+
+                        if result.is_some() {
+                            self.app.card_revised(result.unwrap());
+                            self.state = GuiState::RevisingWithoutAnswer;
+                        }
+                    })
                 });
             }
 
