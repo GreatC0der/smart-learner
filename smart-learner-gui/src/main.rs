@@ -140,15 +140,16 @@ impl eframe::App for GuiApp {
                         ui.checkbox(&mut self.app.back_search, "Back search");
                     });
                     //search results
-
-                    for entry in self.app.search() {
-                        ui.group(|ui| {
-                            if ui.link(entry.1).clicked() {
-                                self.app.change_card(entry.0);
-                                self.state = GuiState::Editor;
-                            }
-                        });
-                    }
+                    egui::containers::ScrollArea::vertical().show(ui, |ui| {
+                        for entry in self.app.search() {
+                            ui.group(|ui| {
+                                if ui.link(entry.1).clicked() {
+                                    self.app.change_card(entry.0);
+                                    self.state = GuiState::Editor;
+                                }
+                            });
+                        }
+                    });
                 });
             }
 
