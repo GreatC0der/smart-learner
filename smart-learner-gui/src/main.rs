@@ -114,6 +114,11 @@ impl eframe::App for GuiApp {
                         self.app.edit_card();
                         self.state = GuiState::Main;
                     }
+
+                    if ui.button("Delete").clicked() {
+                        self.app.delete_card();
+                        self.state = GuiState::Main;
+                    }
                 });
             }
 

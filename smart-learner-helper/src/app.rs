@@ -136,4 +136,9 @@ impl App {
     pub fn card_revised(&mut self, result: Result) {
         self.decks[self.current_deck].value.cards[self.current_card.unwrap()].review(result);
     }
+
+    pub fn delete_card(&mut self) {
+        self.decks[self.current_deck].value.cards.swap_remove(self.current_card.unwrap());
+        self.current_card = None;
+    }
 }
