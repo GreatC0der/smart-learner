@@ -30,6 +30,7 @@ struct GuiApp {
 
 enum GuiState {
     Main,
+    Browser,
     NewCard,
     RevisingWithoutAnswer,
     RevisingWithAnswer,
@@ -55,11 +56,14 @@ impl eframe::App for GuiApp {
                 if ui.button("Home").clicked() {
                     self.state = GuiState::Main;
                 };
-                if ui.button("Settings").clicked() {
-                    self.state = GuiState::Settings;
+                if ui.button("Browse cards").clicked() {
+                    self.state = GuiState::Browser;
                 };
                 if ui.button("New card").clicked() {
                     self.state = GuiState::NewCard;
+                };
+                if ui.button("Settings").clicked() {
+                    self.state = GuiState::Settings;
                 };
             });
         });
@@ -85,6 +89,37 @@ impl eframe::App for GuiApp {
                         let button = ui.button("Create deck");
                         if button.clicked() {
                             self.app.new_deck(self.new_deck_name.clone());
+                        }
+                    });
+                });
+            }
+
+            GuiState::Browser => {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    ui.horizontal(|ui| {
+                        //choose the deck
+                        egui::ComboBox::from_label("Deck")
+                            .selected_text(self.app.current_deck_name())
+                            .show_ui(ui, |ui| {
+                                for (index, deck) in self.app.decks.iter().enumerate() {
+                                    ui.selectable_value(
+                                        &mut self.app.current_deck,
+                                        index,
+                                        &deck.value.name,
+                                    );
+                                }
+                            });
+
+                        //search field
+                        ui.text_edit_singleline(&mut self.app.search_text);
+
+                        //front or back
+                        ui.checkbox(&mut self.app.back_search, "Back search");
+                    });
+                    //search results
+                    ui.group(|ui| {
+                        for entry in self.app.search() {
+                            if ui.link(entry.1).clicked() {}
                         }
                     });
                 });

@@ -43,4 +43,20 @@ impl Deck {
         }
         result
     }
+
+    pub fn search(&self, back_search: bool, search_text: String) -> Vec<(usize, String)>{
+        let mut result = Vec::new();
+        for (card_index, card) in self.cards.iter().enumerate() {
+            if back_search {
+                if card.back.text.contains(&search_text) {
+                    result.push((card_index, card.back.text.clone()))
+                }
+            } else {
+                if card.front.text.contains(&search_text) {
+                    result.push((card_index, card.front.text.clone()))
+                }
+            }
+        }
+        result
+    }
 }

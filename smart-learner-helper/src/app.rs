@@ -14,6 +14,8 @@ pub struct App {
     pub current_card: Option<usize>,
     pub new_card_front: String,
     pub new_card_back: String,
+    pub search_text: String,
+    pub back_search: bool,
 }
 
 impl App {
@@ -27,6 +29,8 @@ impl App {
             current_card: None,
             new_card_front: String::new(),
             new_card_back: String::new(),
+            search_text: String::new(),
+            back_search: false,
         }
     }
 
@@ -76,9 +80,9 @@ impl App {
     pub fn get_question(&self) -> String {
         if self.current_card.is_some() {
             self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
-            .front
-            .text
-            .clone()
+                .front
+                .text
+                .clone()
         } else {
             "".to_string()
         }
@@ -101,5 +105,11 @@ impl App {
                 text: self.new_card_back.clone(),
             },
         ));
+    }
+
+    pub fn search(&mut self) -> Vec<(usize, String)>{
+        self.decks[self.current_deck]
+            .value
+            .search(self.back_search, self.search_text.clone())
     }
 }
