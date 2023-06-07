@@ -224,8 +224,9 @@ impl eframe::App for GuiApp {
                         });
 
                     if ui.button("Create").clicked() {
-                        self.app.create_card();
-                        self.state = GuiState::Editor;
+                        if self.app.create_card() {
+                            self.state = GuiState::Editor;
+                        }
                     }
                 });
             }

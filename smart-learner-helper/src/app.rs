@@ -93,7 +93,12 @@ impl App {
         }
     }
 
-    pub fn create_card(&mut self) {
+    pub fn create_card(&mut self) -> bool {
+        if self.decks.len() == 0 {
+            self.current_card = None;
+            return false
+        }
+
         self.decks[self.current_deck].value.cards.push(Card::new(
             Field {
                 text: "New front".to_string(),
@@ -103,6 +108,7 @@ impl App {
             },
         ));
         self.change_card(self.decks[self.current_deck].value.cards.len() - 1);
+        true
     }
 
     pub fn edit_card(&mut self) {
