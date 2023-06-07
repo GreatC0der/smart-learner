@@ -162,11 +162,17 @@ impl eframe::App for GuiApp {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     if self.app.get_card_for_revision() {
                         ui.group(|ui| ui.heading(&self.app.card_front));
-                        if ui.button("Show answer").clicked()
-                            || ctx.input(|i| i.key_pressed(Key::Space))
-                        {
-                            self.state = GuiState::RevisingWithAnswer;
-                        }
+
+                        ui.horizontal(|ui| {
+                            if ui.button("Show answer").clicked()
+                                || ctx.input(|i| i.key_pressed(Key::Space))
+                            {
+                                self.state = GuiState::RevisingWithAnswer;
+                            }
+                            if ui.button("Edit").clicked() {
+                                self.state = GuiState::Editor;
+                            }
+                        });
                     } else {
                         ui.heading("No cards to review.");
                     }
