@@ -91,6 +91,7 @@ impl eframe::App for GuiApp {
                         let button = ui.button("Create deck");
                         if button.clicked() {
                             self.app.new_deck(self.new_deck_name.clone());
+                            self.new_deck_name = String::new();
                         }
                     });
                 });
