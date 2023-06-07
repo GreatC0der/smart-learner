@@ -96,10 +96,10 @@ impl App {
     pub fn create_card(&mut self) {
         self.decks[self.current_deck].value.cards.push(Card::new(
             Field {
-                text: "".to_string(),
+                text: "New front".to_string(),
             },
             Field {
-                text: "".to_string(),
+                text: "New back".to_string(),
             },
         ));
         self.change_card(self.decks[self.current_deck].value.cards.len() - 1);
