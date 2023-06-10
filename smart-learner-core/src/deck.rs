@@ -26,8 +26,10 @@ impl Deck {
         let days_since_last_update = self.last_update.difference(&current_date);
 
         for card_index in 0..self.cards.len() {
-            if self.cards[card_index].current_repeat_in > 0 {
+            if self.cards[card_index].current_repeat_in > days_since_last_update {
                 self.cards[card_index].current_repeat_in -= days_since_last_update;
+            } else {
+                self.cards[card_index].current_repeat_in = 0;
             }
         }
 
