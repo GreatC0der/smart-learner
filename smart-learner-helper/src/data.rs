@@ -41,5 +41,7 @@ pub fn fetch_decks(path: &Path) -> Vec<DeckFromFile> {
 fn load_deck(path: &Path) -> Deck {
     let file = OpenOptions::new().read(true).open(path).unwrap();
     let data = io::read_to_string(file).unwrap();
-    serde_json::from_str(&data).unwrap()
+    let mut deck: Deck = serde_json::from_str(&data).unwrap();
+    deck.update();
+    deck
 }
