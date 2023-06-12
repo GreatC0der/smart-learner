@@ -68,12 +68,11 @@ impl eframe::App for GuiApp {
                             self.new_deck_name = String::new();
                         }
                     });
-                    
+
                     // Displaying decks
-                    let label = ui.label("Decks:");
                     egui::containers::ScrollArea::vertical().show(ui, |ui| {                        
                         for (index, deck) in self.app.decks.iter().enumerate() {
-                            if ui.link(&deck.value.name).labelled_by(label.id).clicked() {
+                            if ui.link(&deck.value.name).clicked() {
                                 self.state = GuiState::RevisingWithoutAnswer;
                                 self.app.current_deck = index;
                             }
