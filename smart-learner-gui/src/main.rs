@@ -52,38 +52,12 @@ impl Default for GuiApp {
 
 impl eframe::App for GuiApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // Menu
-        egui::TopBottomPanel::bottom(Id::new("menu")).show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                if ui.button("Home").clicked() {
-                    self.state = GuiState::Main;
-                };
-                if ui.button("Browse cards").clicked() {
-                    self.state = GuiState::Browser;
-                };
-                if ui.button("New card").clicked() {
-                    self.state = GuiState::NewCard;
-                };
-                if ui.button("Settings").clicked() {
-                    self.state = GuiState::Settings;
-                };
-            });
-        });
-
+        
         // Showing the page
         match self.state {
             GuiState::Main => {
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    // Displaying decks
-                    let label = ui.label("Decks:");
-                    for (index, deck) in self.app.decks.iter().enumerate() {
-                        if ui.link(&deck.value.name).labelled_by(label.id).clicked() {
-                            self.state = GuiState::RevisingWithoutAnswer;
-                            self.app.current_deck = index;
-                        }
-                    }
-
-                    // Horisontal thingy to create new decks
+                    // Thingy to create new decks
                     ui.horizontal(|ui| {
                         let label = ui.label("Deck name:");
                         ui.text_edit_singleline(&mut self.new_deck_name)
@@ -94,6 +68,18 @@ impl eframe::App for GuiApp {
                             self.new_deck_name = String::new();
                         }
                     });
+                    
+                    // Displaying decks
+                    let label = ui.label("Decks:");
+                    egui::containers::ScrollArea::vertical().show(ui, |ui| {                        
+                        for (index, deck) in self.app.decks.iter().enumerate() {
+                            if ui.link(&deck.value.name).labelled_by(label.id).clicked() {
+                                self.state = GuiState::RevisingWithoutAnswer;
+                                self.app.current_deck = index;
+                            }
+                        }
+                    });
+
                 });
             }
 
@@ -252,5 +238,22 @@ impl eframe::App for GuiApp {
                 });
             }
         }
+        // Menu
+        egui::TopBottomPanel::bottom(Id::new("menu")).show(ctx, |ui| {
+            ui.horizontal(|ui| {
+                if ui.button("Home").clicked() {
+                    self.state = GuiState::Main;
+                };
+                if ui.button("Browse cards").clicked() {
+                    self.state = GuiState::Browser;
+                };
+                if ui.button("New card").clicked() {
+                    self.state = GuiState::NewCard;
+                };
+                if ui.button("Settings").clicked() {
+                    self.state = GuiState::Settings;
+                };
+            });
+        });
     }
 }
