@@ -10,6 +10,14 @@
 - [ ] - Audio fields.
 - [ ] - Defenition & pronunciation parser.
 
+## Building
+You need to install rust first.
+```sh
+    git clone https://github.com/GreatC0der/smart-learner.git
+    cd smart-learner/smart-learner-gui
+    cargo build -r
+```
+
 ## Screenshots
 ![image](/screenshots/main_menu.png)
 ![image](/screenshots/editor.png)
