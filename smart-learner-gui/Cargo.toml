@@ -1,13 +1,14 @@
 [package]
 name = "smart-learner-gui"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+repository.workspace = true
 
 [dependencies]
-eframe = "0.22.0"
-egui_file = "0.9.0"
-env_logger = "0.10.0"
-smart-learner-core = { version = "0.1.0", path = "../smart-learner-core" }
-smart-learner-helper = { version = "0.1.0", path = "../smart-learner-helper" }
+eframe.workspace = true
+egui_file.workspace = true
+env_logger.workspace = true
+smart-learner-core.workspace = true
+smart-learner-helper.workspace = true

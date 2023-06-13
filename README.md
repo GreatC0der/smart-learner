@@ -14,8 +14,7 @@
 You need to install rust first.
 ```sh
     git clone https://github.com/GreatC0der/smart-learner.git
-    cd smart-learner/smart-learner-gui
-    cargo build -r
+    cargo install --path ./smart-learner/smart-learner-gui/
 ```
 
 ## Screenshots

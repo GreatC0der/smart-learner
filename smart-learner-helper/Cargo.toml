@@ -1,13 +1,16 @@
 [package]
 name = "smart-learner-helper"
-version = "0.1.0"
-edition = "2021"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+repository.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-confy = "0.5.1"
-serde = "1.0.163"
-serde_derive = "1.0.163"
-serde_json = "1.0.96"
-smart-learner-core = { version = "0.1.0", path = "../smart-learner-core" }
+confy.workspace = true
+serde.workspace = true
+serde_derive.workspace = true
+serde_json.workspace = true
+smart-learner-core.workspace = true
