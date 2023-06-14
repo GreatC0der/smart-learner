@@ -14,3 +14,4 @@ serde.workspace = true
 serde_derive.workspace = true
 serde_json.workspace = true
 smart-learner-core.workspace = true
+rodio.workspace = true

@@ -1,4 +1,8 @@
+use rodio::{Decoder, OutputStream, Source};
+use std::fs::File;
+use std::io::BufReader;
 use std::path::Path;
+use std::thread;
 
 use smart_learner_core::{card::Card, deck::Deck, field::Field, result::Result};
 
@@ -43,11 +47,12 @@ impl App {
         });
     }
 
-    pub fn get_card_for_revision(&mut self) -> bool {
+    /// Returns (card_exists, got a new card).
+    pub fn get_card_for_revision(&mut self) -> (bool, bool) {
         self.current_card = match self.current_card {
             Some(result) => {
                 if self.decks[self.current_deck].value.cards[result].current_repeat_in == 0 {
-                    Some(result)
+                    return (true, false);
                 } else {
                     self.decks[self.current_deck].value.due_card()
                 }
@@ -57,9 +62,9 @@ impl App {
 
         if self.current_card.is_some() {
             self.change_card(self.current_card.unwrap());
-            true
+            (true, true)
         } else {
-            false
+            (false, false)
         }
     }
 
@@ -96,15 +101,17 @@ impl App {
     pub fn create_card(&mut self) -> bool {
         if self.decks.len() == 0 {
             self.current_card = None;
-            return false
+            return false;
         }
 
         self.decks[self.current_deck].value.cards.push(Card::new(
             Field {
                 text: "New front".to_string(),
+                audio_path: None,
             },
             Field {
                 text: "New back".to_string(),
+                audio_path: None,
             },
         ));
         self.change_card(self.decks[self.current_deck].value.cards.len() - 1);
@@ -115,9 +122,11 @@ impl App {
         self.decks[self.current_deck].value.cards[self.current_card.unwrap()] = Card::new(
             Field {
                 text: self.card_front.clone(),
+                audio_path: None,
             },
             Field {
                 text: self.card_back.clone(),
+                audio_path: None,
             },
         );
     }
@@ -144,7 +153,41 @@ impl App {
     }
 
     pub fn delete_card(&mut self) {
-        self.decks[self.current_deck].value.cards.swap_remove(self.current_card.unwrap());
+        self.decks[self.current_deck]
+            .value
+            .cards
+            .swap_remove(self.current_card.unwrap());
         self.current_card = None;
+    }
+
+    fn play_audio(&self, path: String) {
+        let path = Path::new(&self.config.folder_path)
+            .to_path_buf()
+            .join(Path::new("audio"))
+            .join(Path::new(&path));
+
+        thread::spawn(|| {
+            let file = BufReader::new(File::open(path).unwrap());
+            let source = Decoder::new(file).unwrap();
+
+            let (_stream, stream_handle) = OutputStream::try_default().unwrap();
+
+            stream_handle.play_raw(source.convert_samples()).unwrap();
+            std::thread::sleep(std::time::Duration::from_secs(5));
+        });
+    }
+
+    pub fn play_front_audio(&self) {
+        let card = &self.decks[self.current_deck].value.cards[self.current_card.unwrap()];
+        if card.front.audio_path.is_some() {
+            self.play_audio(card.front.audio_path.clone().unwrap());
+        }
+    }
+
+    pub fn play_back_audio(&self) {
+        let card = &self.decks[self.current_deck].value.cards[self.current_card.unwrap()];
+        if card.back.audio_path.is_some() {
+            self.play_audio(card.back.audio_path.clone().unwrap());
+        }
     }
 }

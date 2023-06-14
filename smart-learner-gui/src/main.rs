@@ -52,7 +52,6 @@ impl Default for GuiApp {
 
 impl eframe::App for GuiApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        
         // Showing the page
         match self.state {
             GuiState::Main => {
@@ -70,7 +69,7 @@ impl eframe::App for GuiApp {
                     });
 
                     // Displaying decks
-                    egui::containers::ScrollArea::vertical().show(ui, |ui| {                        
+                    egui::containers::ScrollArea::vertical().show(ui, |ui| {
                         for (index, deck) in self.app.decks.iter().enumerate() {
                             if ui.link(&deck.value.name).clicked() {
                                 self.state = GuiState::RevisingWithoutAnswer;
@@ -78,7 +77,6 @@ impl eframe::App for GuiApp {
                             }
                         }
                     });
-
                 });
             }
 
@@ -146,7 +144,13 @@ impl eframe::App for GuiApp {
 
             GuiState::RevisingWithoutAnswer => {
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    if self.app.get_card_for_revision() {
+                    let revision_result = self.app.get_card_for_revision();
+
+                    if revision_result.0 {
+                        if revision_result.1 {
+                            self.app.play_front_audio();
+                        }
+
                         ui.group(|ui| ui.heading(&self.app.card_front));
 
                         ui.horizontal(|ui| {
