@@ -1,5 +1,5 @@
 use rodio::{Decoder, OutputStream, Source};
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::BufReader;
 use std::path::Path;
 use std::thread;
@@ -119,16 +119,13 @@ impl App {
     }
 
     pub fn edit_card(&mut self) {
-        self.decks[self.current_deck].value.cards[self.current_card.unwrap()] = Card::new(
-            Field {
-                text: self.card_front.clone(),
-                audio_path: None,
-            },
-            Field {
-                text: self.card_back.clone(),
-                audio_path: None,
-            },
-        );
+        self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
+            .front
+            .text = self.card_front.clone();
+
+        self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
+            .back
+            .text = self.card_back.clone();
     }
 
     pub fn search(&mut self) -> Vec<(usize, String)> {
@@ -189,5 +186,69 @@ impl App {
         if card.back.audio_path.is_some() {
             self.play_audio(card.back.audio_path.clone().unwrap());
         }
+    }
+
+    fn get_audio_file(&mut self, path: String) {
+        // Getting a file name
+        let old_file_name = Path::new(&path)
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
+
+        // Audio folder in folder with decks
+        let audio_path_stem = Path::new(&self.config.folder_path).join("audio");
+
+        // Path to a audio folder and old filename
+        let mut new_file_path = audio_path_stem.join(old_file_name.clone());
+
+        // Change filename if it exists
+        if audio_path_stem.join(&old_file_name).exists() {
+            for i in 1.. {
+                let clone = old_file_name.clone();
+                let mut path_iter = clone.split('.');
+                let file_extention = ".".to_owned() + path_iter.next_back().unwrap();
+                let file_name = path_iter.next_back().unwrap();
+                let file_name_string = format!("{}{}{}", file_name, i.to_string(), file_extention);
+                let file_name_path = Path::new(&file_name_string);
+                new_file_path = audio_path_stem.join(file_name_path);
+
+                if !new_file_path.exists() {
+                    break;
+                }
+            }
+        }
+
+        // Copy a file to the local folder
+        fs::copy(path.clone(), new_file_path).unwrap();
+    }
+
+    pub fn change_front_audio(&mut self, path: String) {
+        self.get_audio_file(path.clone());
+        self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
+            .front
+            .audio_path = Some(path);
+    }
+
+    pub fn change_back_audio(&mut self, path: String) {
+        self.get_audio_file(path.clone());
+        self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
+            .back
+            .audio_path = Some(path);
+    }
+
+    pub fn front_audio_exists(&self) -> bool {
+        self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
+            .front
+            .audio_path
+            .is_some()
+    }
+
+    pub fn back_audio_exists(&self) -> bool {
+        self.decks[self.current_deck].value.cards[self.current_card.unwrap()]
+            .back
+            .audio_path
+            .is_some()
     }
 }

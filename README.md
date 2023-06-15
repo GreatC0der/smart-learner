@@ -7,7 +7,7 @@
 - [x] - Custom path to folder with decks.
 - [x] - Cards editor.
 - [x] - Text fields.
-- [ ] - Audio fields.
+- [x] - Audio fields.
 - [ ] - Defenition & pronunciation parser.
 
 ## Building

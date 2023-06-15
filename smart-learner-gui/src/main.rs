@@ -26,7 +26,7 @@ struct GuiApp {
     app: App,
     state: GuiState,
     new_deck_name: String,
-    choose_folder_dialog: Option<FileDialog>,
+    file_dialog: Option<FileDialog>,
 }
 
 enum GuiState {
@@ -45,7 +45,7 @@ impl Default for GuiApp {
             app: App::new(),
             state: GuiState::Main,
             new_deck_name: "".to_string(),
-            choose_folder_dialog: None,
+            file_dialog: None,
         }
     }
 }
@@ -86,12 +86,46 @@ impl eframe::App for GuiApp {
                         let label = ui.label("Front:");
                         ui.text_edit_multiline(&mut self.app.card_front)
                             .labelled_by(label.id);
+
+                        if ui.button("Choose audio").clicked() {
+                            let mut dialog =
+                                FileDialog::open_file(None).default_size(Vec2::new(480.0, 300.0));
+                            dialog.open();
+                            self.file_dialog = Some(dialog);
+                        }
+
+                        if let Some(dialog) = &mut self.file_dialog {
+                            if dialog.show(ctx).selected() {
+                                if let Some(file) = dialog.path() {
+                                    self.app.change_front_audio(
+                                        file.as_path().to_str().unwrap().to_string(),
+                                    );
+                                }
+                            }
+                        }
                     });
 
                     ui.group(|ui| {
                         let label = ui.label("Back:");
                         ui.text_edit_multiline(&mut self.app.card_back)
                             .labelled_by(label.id);
+
+                        if ui.button("Choose audio").clicked() {
+                            let mut dialog =
+                                FileDialog::open_file(None).default_size(Vec2::new(480.0, 300.0));
+                            dialog.open();
+                            self.file_dialog = Some(dialog);
+                        }
+
+                        if let Some(dialog) = &mut self.file_dialog {
+                            if dialog.show(ctx).selected() {
+                                if let Some(file) = dialog.path() {
+                                    self.app.change_back_audio(
+                                        file.as_path().to_str().unwrap().to_string(),
+                                    );
+                                }
+                            }
+                        }
                     });
 
                     if ui.button("Save").clicked() {
@@ -151,13 +185,21 @@ impl eframe::App for GuiApp {
                             self.app.play_front_audio();
                         }
 
-                        ui.group(|ui| ui.heading(&self.app.card_front));
+                        ui.group(|ui| {
+                            ui.heading(&self.app.card_front);
+                            if self.app.front_audio_exists() {
+                                if ui.button("Play audio").clicked() {
+                                    self.app.play_front_audio();
+                                }
+                            }
+                        });
 
                         ui.horizontal(|ui| {
                             if ui.button("Show answer").clicked()
                                 || ctx.input(|i| i.key_pressed(Key::Space))
                             {
                                 self.state = GuiState::RevisingWithAnswer;
+                                self.app.play_back_audio();
                             }
                             if ui.button("Edit").clicked() {
                                 self.state = GuiState::Editor;
@@ -171,8 +213,23 @@ impl eframe::App for GuiApp {
 
             GuiState::RevisingWithAnswer => {
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    ui.group(|ui| ui.heading(&self.app.card_front));
-                    ui.group(|ui| ui.heading(&self.app.card_back));
+                    ui.group(|ui| {
+                        ui.heading(&self.app.card_front);
+                        if self.app.front_audio_exists() {
+                            if ui.button("Play audio").clicked() {
+                                self.app.play_front_audio();
+                            }
+                        }
+                    });
+
+                    ui.group(|ui| {
+                        ui.heading(&self.app.card_back);
+                        if self.app.back_audio_exists() {
+                            if ui.button("Play audio").clicked() {
+                                self.app.play_back_audio();
+                            }
+                        }
+                    });
 
                     ui.horizontal(|ui| {
                         let mut result = None;
@@ -227,10 +284,10 @@ impl eframe::App for GuiApp {
                         let mut dialog =
                             FileDialog::select_folder(None).default_size(Vec2::new(480.0, 300.0));
                         dialog.open();
-                        self.choose_folder_dialog = Some(dialog);
+                        self.file_dialog = Some(dialog);
                     }
 
-                    if let Some(dialog) = &mut self.choose_folder_dialog {
+                    if let Some(dialog) = &mut self.file_dialog {
                         if dialog.show(ctx).selected() {
                             if let Some(file) = dialog.path() {
                                 self.app.config.folder_path =
