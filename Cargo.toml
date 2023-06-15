@@ -3,7 +3,7 @@ members = ["smart-learner-core", "smart-learner-helper", "smart-learner-gui"]
 default-members = ["smart-learner-gui"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["GreatC0der"]
 description = "Flashcards application."
