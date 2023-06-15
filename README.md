@@ -1,5 +1,7 @@
 # smart-learner
 ### Don't study hard, study smart.
+#### Current version - 0.2.*
+#### Program will be released when version hits 1.0.0
 
 ## Features
 - [x] - Spaced repetition.
