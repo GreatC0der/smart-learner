@@ -1,3 +1,5 @@
+## This project is archived. The architechture is really bad so it's very difficult to improve the program.
+
 # smart-learner
 ### Don't study hard, study smart.
 #### Current version - 0.2.*
